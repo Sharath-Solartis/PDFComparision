@@ -1,4 +1,4 @@
-package PDFDynamic.PDFDynamicComparision;
+package PDF;
 
 import java.io.File;
 import java.io.FileNotFoundException;

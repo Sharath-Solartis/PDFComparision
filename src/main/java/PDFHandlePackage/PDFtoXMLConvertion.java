@@ -1,27 +1,19 @@
-package PDFDynamic.PDFDynamicComparision;
+package PDFHandlePackage;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-//import pdf.XMLOutputTarget;
-
 import com.snowtide.PDF;
 import com.snowtide.pdf.Configuration;
 import com.snowtide.pdf.OutputHandler;
@@ -30,24 +22,18 @@ import com.snowtide.pdf.layout.Block;
 import com.snowtide.pdf.layout.Region;
 import com.snowtide.pdf.layout.Table;
 import com.snowtide.pdf.layout.TextUnit;
-import com.snowtide.util.logging.Log;
-import com.snowtide.util.logging.LoggingRegistry;
 
+@SuppressWarnings("unused")
 public class PDFtoXMLConvertion extends OutputHandler 
-{
-  //  private static final Log log = LoggingRegistry.getLog(XMLOutputTarget.class);
-    
+{   
     private static final String ELT_BOLD = "bold";
     private static final String ELT_UNDERLINED = "underlined";
     private static final String ELT_ITALIC = "italic";
     private static final String ELT_TEXT = "text";
-    private static final String ELT_STRUCKTHROUGH = "strikethrough";
-    
+    private static final String ELT_STRUCKTHROUGH = "strikethrough";   
     private final Document doc;
     private final Element root;
-    private static String xmlfile;
-    
-    // we keep this around so we know how far to walk up the DOM in closeText()
+	private static String xmlfile;
     private Element textEltParent;
     private Element currentElt;
     
@@ -56,15 +42,9 @@ public class PDFtoXMLConvertion extends OutputHandler
     private boolean isItalic = false;
     private boolean isUnderlined = false;
     private boolean isStruckThrough = false;
-
 	private StringBuilder whitespace = new StringBuilder(512);
 	public boolean flag=false;
-    
-    /**
-     * Creates a new <code>XMLOutputTarget</code>.
-     * 
-     * @throws IOException if an error occurs initializing a new DOM document
-     */
+  
     public PDFtoXMLConvertion () throws IOException 
     {
         try 
@@ -76,9 +56,6 @@ public class PDFtoXMLConvertion extends OutputHandler
         }
     }
     
-    /**
-     * Returns the DOM Document that this <code>XMLOutputTarget</code> is building.
-     */
     public void startPDF (String pdfName, File pdfFile) 
     {
     	
@@ -88,7 +65,7 @@ public class PDFtoXMLConvertion extends OutputHandler
 
     public void endPDF (String pdfName, File pdfFile) 
     {
-        closeText();
+       closeText();
        closeContext("pdf");
     }
     
@@ -129,8 +106,6 @@ public class PDFtoXMLConvertion extends OutputHandler
         String s;
         if (tu.getCharacterSequence() == null) 
         {
-            //no mapping, append direct character code conversion
-            // skip all control characters -- they'll cause all sorts of problems (readers signalling EOF early, etc)
             int cc = tu.getCharCode();
             if (cc < 32) 
             {
@@ -143,7 +118,6 @@ public class PDFtoXMLConvertion extends OutputHandler
         } 
         else 
         {
-            //found mapping, append mapped characters
         	s = new String(tu.getCharacterSequence());
         }
         currentElt.appendChild(doc.createTextNode(s));
@@ -202,10 +176,6 @@ public class PDFtoXMLConvertion extends OutputHandler
     	isBold = isUnderlined = isStruckThrough = isItalic = false;
     }    
   
-    /**
-     * Returns the XML built by this <code>XMLOutputTarget</code> as a <code>String</code>.
-     */
-       
     private void normalizeStyleElts (boolean bold, boolean italic, boolean underline, boolean struckThrough) 
     {
         if (isBold && !bold) closeThroughTextContext(ELT_BOLD);
@@ -248,7 +218,8 @@ public class PDFtoXMLConvertion extends OutputHandler
         }
     }   
     
-    private static void writeCoordsAsAttrs (Region r, Element context) 
+    @SuppressWarnings("deprecation")
+	private static void writeCoordsAsAttrs (Region r, Element context) 
     {
     	context.setAttribute("xpos", Float.toString(r.xpos()));
     	context.setAttribute("ypos", Float.toString(r.ypos()));
@@ -272,10 +243,8 @@ public class PDFtoXMLConvertion extends OutputHandler
 		} 
     	catch (TransformerException e) 
     	{
-          //  log.error("Error occurred serializing extracted PDF form data to XML", e);
             throw new IOException("Error occurred serializing extracted PDF form data to XML: " + e.getMessage());
 		}
-    	//System.out.println(s.toString());
     	return s.toString();
     	
     }  
@@ -294,7 +263,6 @@ public class PDFtoXMLConvertion extends OutputHandler
    
     public static void main (String[] args) throws Exception 
     {
-       // for (int i = 0; i < args.length; i++) 
     		String filename="C:/Users/rajaprabhu_r.SOLARTISTECH/Downloads/StarrInsure_ISSUANCE_OCT-9-2017-17-55-43.1.pdf";
             File src = new File(filename);
             if (!src.exists()) System.out.println("No such file: " + filename);
