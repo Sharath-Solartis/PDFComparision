@@ -23,25 +23,22 @@ public class XmlHandle
 	//***************constructor to load file location***************************************************************
 	public XmlHandle(String file_location)
 	{
-		this.file_location = file_location;
-		
+		this.file_location = file_location;	
 	}
 	
 	//*****************method for reading the XML input file by passing the xpath value******************************
 	 
 	public void getFilePath(String filepath) 
 	{
-		// TODO Auto-generated method stub
 		this.file_location = filepath;
 	}
 	
 	public XmlHandle() 
 	{
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	
-
 	public String read(String xpath) throws PDFHandleException
 	{
 		File inputFile = new File(file_location);
@@ -189,38 +186,6 @@ public class XmlHandle
 		return document.asXML();
 		
 	}
-	
-	
-	/*private String getxpath(String xpath) throws UnsupportedEncodingException, IOException,DocumentException
-	{
-		if(!(xpath.contains("=")))
-		{
-			return xpath;
-		}
-		else
-		{
-			String path[] = xpath.split("=");
-			File inputFile = new File(file_location);
-	        SAXReader reader = new SAXReader();
-	        Document document = reader.read(inputFile);
-	        String output = null;
-	        output = path[0];
-	        Node node = document.selectSingleNode(output);
-	        
-			
-		}
-		return null;
-	}
-	*/
-	
-	
-	
-	 
-	 
-	 
-
-
-
 
 }
 
