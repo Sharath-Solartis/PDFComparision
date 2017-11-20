@@ -6,14 +6,17 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import com.snowtide.PDF;
 import com.snowtide.pdf.Configuration;
 import com.snowtide.pdf.OutputHandler;
@@ -22,18 +25,25 @@ import com.snowtide.pdf.layout.Block;
 import com.snowtide.pdf.layout.Region;
 import com.snowtide.pdf.layout.Table;
 import com.snowtide.pdf.layout.TextUnit;
+import com.snowtide.util.logging.Log;
+import com.snowtide.util.logging.LoggingRegistry;
 
 @SuppressWarnings("unused")
 public class PDFtoXMLConvertion extends OutputHandler 
-{   
+{
+    private static final Log log = LoggingRegistry.getLog(PDFtoXMLConvertion.class);
+    
     private static final String ELT_BOLD = "bold";
     private static final String ELT_UNDERLINED = "underlined";
     private static final String ELT_ITALIC = "italic";
     private static final String ELT_TEXT = "text";
-    private static final String ELT_STRUCKTHROUGH = "strikethrough";   
+    private static final String ELT_STRUCKTHROUGH = "strikethrough";
+    
     private final Document doc;
     private final Element root;
-	private static String xmlfile;
+    private static String xmlfile;
+    
+    // we keep this around so we know how far to walk up the DOM in closeText()
     private Element textEltParent;
     private Element currentElt;
     
@@ -42,40 +52,57 @@ public class PDFtoXMLConvertion extends OutputHandler
     private boolean isItalic = false;
     private boolean isUnderlined = false;
     private boolean isStruckThrough = false;
+
 	private StringBuilder whitespace = new StringBuilder(512);
 	public boolean flag=false;
-  
-    public PDFtoXMLConvertion () throws IOException 
+	private int pagenumber;
+	private int continouspagenumber;
+    
+    /**
+     * Creates a new <code>XMLOutputTarget</code>.
+     * 
+     * @throws IOException if an error occurs initializing a new DOM document
+     */
+    public PDFtoXMLConvertion (int pagenumber) throws IOException 
     {
-        try 
+        this.pagenumber=pagenumber;
+    	try 
         {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             doc.appendChild(currentElt = root = doc.createElement("pdftsExtract"));
-        } catch (Exception e) {
+        } 
+    	catch (Exception e) 
+    	{
             throw new IOException("Configuration error encountered while initializing XML facilities: " +e.getMessage());
         }
     }
     
+    /**
+     * Returns the DOM Document that this <code>XMLOutputTarget</code> is building.
+     */
     public void startPDF (String pdfName, File pdfFile) 
     {
+    	//if(flag=false)
     	
-    		newContext("pdf").setAttribute("name", pdfName);
+    		//newContext("pdf").setAttribute("name", pdfName);
+    		//flag=true;
     	
     }
 
     public void endPDF (String pdfName, File pdfFile) 
     {
-       closeText();
-       closeContext("pdf");
+     //  closeText();
+       //closeContext("pdf");
     }
     
     public void startPage (Page page) 
     {
     	linebreak = page.getConfig().getLinebreakString();
         closeText();
-        newContext("page").setAttribute("number", Integer.toString(page.getPageNumber()));
+        continouspagenumber=pagenumber+page.getPageNumber();
+        newContext("page").setAttribute("number", Integer.toString(continouspagenumber));//page.getPageNumber()));
     }
-    
+     
     public void endPage (Page page) 
     {
         closeText();
@@ -106,6 +133,8 @@ public class PDFtoXMLConvertion extends OutputHandler
         String s;
         if (tu.getCharacterSequence() == null) 
         {
+            // no mapping, append direct character code conversion
+            // skip all control characters -- they'll cause all sorts of problems (readers signalling EOF early, etc)
             int cc = tu.getCharCode();
             if (cc < 32) 
             {
@@ -118,6 +147,7 @@ public class PDFtoXMLConvertion extends OutputHandler
         } 
         else 
         {
+            //found mapping, append mapped characters
         	s = new String(tu.getCharacterSequence());
         }
         currentElt.appendChild(doc.createTextNode(s));
@@ -176,6 +206,10 @@ public class PDFtoXMLConvertion extends OutputHandler
     	isBold = isUnderlined = isStruckThrough = isItalic = false;
     }    
   
+    /**
+     * Returns the XML built by this <code>XMLOutputTarget</code> as a <code>String</code>.
+     */
+       
     private void normalizeStyleElts (boolean bold, boolean italic, boolean underline, boolean struckThrough) 
     {
         if (isBold && !bold) closeThroughTextContext(ELT_BOLD);
@@ -234,7 +268,7 @@ public class PDFtoXMLConvertion extends OutputHandler
     	return whitespace.toString();
     }
     
-    protected String getXMLAsString () throws IOException 
+    public String getXMLAsString () throws IOException 
     {
     	StringWriter s = new StringWriter();
     	try 
@@ -243,8 +277,10 @@ public class PDFtoXMLConvertion extends OutputHandler
 		} 
     	catch (TransformerException e) 
     	{
+            log.error("Error occurred serializing extracted PDF form data to XML", e);
             throw new IOException("Error occurred serializing extracted PDF form data to XML: " + e.getMessage());
 		}
+    	//System.out.println(s.toString());
     	return s.toString();
     	
     }  
@@ -258,12 +294,17 @@ public class PDFtoXMLConvertion extends OutputHandler
         trans.transform(source, result);
     }  
     
-     
+    public int pagenumber()
+    {
+    	return continouspagenumber;
+    }
+    
     
    
     public static void main (String[] args) throws Exception 
     {
-    		String filename="C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\StarrInsure_ISSUANCE_NOV-3-2017-17-4-3.pdf";
+       // for (int i = 0; i < args.length; i++) 
+    		String filename="C:/Users/rajaprabhu_r.SOLARTISTECH/Downloads/StarrInsure_ISSUANCE_OCT-9-2017-17-55-43.1.pdf";
             File src = new File(filename);
             if (!src.exists()) System.out.println("No such file: " + filename);
             if (!src.canRead()) System.out.println("Cannot read file (check permissions): " + filename);
@@ -271,7 +312,7 @@ public class PDFtoXMLConvertion extends OutputHandler
             File destFile = new File(filename + ".xml");
             com.snowtide.pdf.Document stream = PDF.open(src);
             
-            PDFtoXMLConvertion tgt = new PDFtoXMLConvertion();
+            PDFtoXMLConvertion tgt = new PDFtoXMLConvertion(1);
             stream.pipe(tgt);
             
             OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(destFile), "UTF-8");
