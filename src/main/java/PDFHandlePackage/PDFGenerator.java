@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,8 +31,9 @@ public class PDFGenerator
     protected static boolean image_flag = true;	protected static BufferedReader reader;
 	protected static String Pdf;
 	protected static String SourceString;
+	protected static HashMap<String, String> Hashmap;
 	
-	public static void GeneratePDF(String ModifiedXML, String OriginalXML, String DataFeededXML) throws IOException 
+	public static void GeneratePDF(String ModifiedXML, String OriginalXML, String DataFeededXML, HashMap<String, String> Hashmap) throws IOException 
 	{
 		String Value = null;
 		List<String> ValueList = new ArrayList<String> ();
@@ -52,7 +54,7 @@ public class PDFGenerator
 		{
 		    System.out.println(ValueList.get(i));
 		} 
-		SourceString = GenerateSourceXML(ValueList);
+		SourceString = GenerateSourceXML(ValueList, Hashmap);
 		
 		Pdf = readFile(OriginalXML);
 		StringBuffer buf = new StringBuffer(Pdf);
@@ -68,7 +70,7 @@ public class PDFGenerator
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private static String  GenerateSourceXML(List Pathlist) throws IOException
+	private static String  GenerateSourceXML(List Pathlist, HashMap<String, String> Hashmap) throws IOException
 	{	
 		for(int i=0;i<Pathlist.size();i++)
 		{
@@ -104,7 +106,7 @@ public class PDFGenerator
 			
 			generateXMLRequest(doc.getDocumentElement());
 			
-			request = request + formRequest(slctkeysArr);
+			request = request + formRequest(slctkeysArr, Hashmap);
 	
 	        flag = false;
 	            
@@ -184,7 +186,7 @@ public class PDFGenerator
 	}
 	
 	
-	private static String formRequest(ArrayList<String> slctkeysArr)
+	private static String formRequest(ArrayList<String> slctkeysArr, HashMap<String, String> Hashmap)
 	{
 		String reqStr = new String();
 		if(flag)
@@ -195,13 +197,10 @@ public class PDFGenerator
 		{
 
 		   slctkeysArr.set(i, filter(slctkeysArr.get(i).toString()));
-                      
-			//if(slctkeysArr.get(i).toString().contentEquals("ISO_BOP_Policy_Number"))//dynamic values
-			//{
-		   			reqStr = reqStr + "\n\t" + "&lt;" + slctkeysArr.get(i).toString()
-					+ "&gt;" + "vicky" + "&lt;/" + slctkeysArr.get(i).toString()//dynamic values
-					+ "&gt;";
-			//}
+		
+		    String PDFAttributeValue = Hashmap.get(slctkeysArr.get(i).toString());          
+			reqStr = reqStr + "\n\t" + "&lt;" + slctkeysArr.get(i).toString() + "&gt;" + PDFAttributeValue + "&lt;/" + slctkeysArr.get(i).toString() +  "&gt;";
+		  
 		}	
 		//reqStr = reqStr + "\n</PDF>";
 		return reqStr;
