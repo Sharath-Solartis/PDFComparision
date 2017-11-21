@@ -87,9 +87,12 @@ public class XMLComparision
 		compareXML(pdftoxml(pdfpath1),pdftoxml(pdfpath2));
 	}
 	
-	public void comparePDF(String expectedURL, String actualURL, String path, String filename)
+	public void comparePDF(String expectedPDFPath, String actualURL, String path, String filename) throws IOException, SAXException
 	{
-		
+		String expectedXML = pdftoxml(expectedPDFPath);
+		urltopdf(actualURL,path,filename);
+		String actualXML = pdftoxml(path+filename+".pdf");
+		compareXML(expectedXML,actualXML);
 	}
 	
 	
