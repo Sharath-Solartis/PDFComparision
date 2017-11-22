@@ -28,7 +28,6 @@ public class XMLComparision
 {
 	@SuppressWarnings("rawtypes")
 	public List alldifferences;
-
 		
 	public void urltopdf(String URL,String path,String filename) throws IOException
 	{
@@ -55,7 +54,6 @@ public class XMLComparision
         writer.flush();
         writer.close();
         return xmlfile;
-
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -93,21 +91,16 @@ public class XMLComparision
 		urltopdf(actualURL,path,filename);
 		String actualXML = pdftoxml(path+filename+".pdf");
 		compareXML(expectedXML,actualXML);
-	}
-	
-	
-	
-	
+	}	
 	
 	public static void main(String args[]) throws SAXException, IOException
 	{
-		XMLComparision comp = new XMLComparision();
-		String pdfpath1="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0017NH.pdf";
-		String pdfpath2="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0114OW.pdf";
+		//XMLComparision comp = new XMLComparision();
+		//String pdfpath1="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0017NH.pdf";
+		//String pdfpath2="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0114OW.pdf";
 		//comp.comparePDF(pdfpath1,pdfpath2);
 		//comp.
-		//comp.urltopdf("D:/ftl/");
-		
+		//comp.urltopdf("D:/ftl/");		
 	}
 
 	
