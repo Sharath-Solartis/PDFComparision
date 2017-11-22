@@ -1,88 +1,107 @@
 package PDF;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import org.custommonkey.xmlunit.DetailedDiff; 
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
+
+import org.dom4j.Document;
 import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.ComparisonControllers;
+
+
+import org.xmlunit.diff.Difference;
+
+import PDFHandlePackage.PDFtoXMLConvertion;
+
+import com.snowtide.PDF;
 public class XMLComparision
 {
-	//final static Logger logger = Logger.getLogger(XMLComparision.class);
-
 	@SuppressWarnings("rawtypes")
-	public static void main(String[] args) 
+	public List alldifferences;
+		
+	public void urltopdf(String URL,String path,String filename) throws IOException
 	{
-		File f1 = new File("C:/Users/vigneshkumar_p.SOLARTISTECH/Desktop/eg1.xml");
-		File f2= new File("C:/Users/vigneshkumar_p.SOLARTISTECH/Desktop/eg2.xml");
-		File f3= new File("C:/Users/vigneshkumar_p.SOLARTISTECH/Desktop/Activity log.log");
-
-		try 
-		{
-			f3.createNewFile();
-	    } 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
+		URL website = new URL(URL);
+		Path targetPath = new File(path + File.separator + filename+".pdf").toPath();
+		InputStream in = website.openStream();		
+		Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);		
+	}
+	
+	protected String pdftoxml(String filepath) throws IOException
+	{
+		String xmlfile="";
+		int pagenumber=0;
+		File src = new File(filepath);
+		PDFtoXMLConvertion tgt = new PDFtoXMLConvertion(pagenumber);
+		com.snowtide.pdf.Document stream = PDF.open(src);
+		stream.pipe(tgt);
+		xmlfile=xmlfile+tgt.getXMLAsString();
+		stream.close();	
+		pagenumber=tgt.pagenumber()+1;
+		File destFile = new File(filepath+".xml");
+        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(destFile), "UTF-8");
+        writer.write(xmlfile);
+        writer.flush();
+        writer.close();
+        return xmlfile;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public ArrayList compareXML(String xml1, String xml2) throws SAXException, IOException
+	{		
+		alldifferences = new ArrayList();
+		org.xmlunit.diff.Diff myDiff = DiffBuilder.compare(xml1).withTest(xml2).withComparisonController(ComparisonControllers.Default).build();
+	    Iterator<Difference> iter = myDiff.getDifferences().iterator();
+	    int size = 0;
+	    while (iter.hasNext()) 
+	    {
+	    	alldifferences.add(iter.next().toString());
+	        System.out.println(iter.next().toString()+"\n");
+	        size++;
 	    }
-		
-		FileReader fr1 = null;
-		FileReader fr2 = null;
-		
-		try 
-		{
-			fr1 = new FileReader(f1);
-			fr2 = new FileReader(f2);
-		} catch (FileNotFoundException e) 
-		{
-			e.printStackTrace();
-        }
-
-		try 
-		{
-			Diff diff = new Diff(fr1, fr2);
-			System.out.println("Similar? " + diff.similar());
-			System.out.println("Identical? " + diff.identical());
-			DetailedDiff detDiff = new DetailedDiff(diff);
-			List differences = detDiff.getAllDifferences();
-				for (Object object : differences) 
-				{
-				    Difference difference = (Difference)object;
-				    System.out.println("***********************");
-				    System.out.println(difference);
-				    System.out.println("***********************");
-				}
-		}
-		catch (SAXException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-
-		XMLComparision obj = new XMLComparision();
-		obj.runMe("ila");
+	    System.out.println(size);
+		return (ArrayList) alldifferences;
 	}
-
-	private void runMe(String parameter)
+	
+	public void compareDoc(Document doc1, Document doc2) throws SAXException, IOException
 	{
-		/*if(logger.isDebugEnabled())
-		{
-		    logger.debug("This is debug : " + parameter);
-		}
-	
-		if(logger.isInfoEnabled())
-		{
-		    logger.info("This is info : " + parameter);
-		}
-	
-		logger.warn("This is warn : " + parameter);
-		logger.error("This is error : " + parameter);
-		logger.fatal("This is fatal : " + parameter);*/
+		String xml1=doc1.asXML().toString();
+		String xml2=doc1.asXML().toString();
+		compareXML(xml1,xml2);
 	}
+	
+	public void comparePDF(String pdfpath1,String pdfpath2) throws SAXException, IOException
+	{
+		compareXML(pdftoxml(pdfpath1),pdftoxml(pdfpath2));
+	}
+	
+	public void comparePDF(String expectedPDFPath, String actualURL, String path, String filename) throws IOException, SAXException
+	{
+		String expectedXML = pdftoxml(expectedPDFPath);
+		urltopdf(actualURL,path,filename);
+		String actualXML = pdftoxml(path+filename+".pdf");
+		compareXML(expectedXML,actualXML);
+	}	
+	
+	public static void main(String args[]) throws SAXException, IOException
+	{
+		//XMLComparision comp = new XMLComparision();
+		//String pdfpath1="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0017NH.pdf";
+		//String pdfpath2="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0114OW.pdf";
+		//comp.comparePDF(pdfpath1,pdfpath2);
+		//comp.
+		//comp.urltopdf("D:/ftl/");		
+	}
+
+	
 } 
