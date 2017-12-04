@@ -18,6 +18,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import PDFHandleException.HTTPHandleException;
+import PDFHandlePackage.HttpHandle;
 
 public class PDFGenerator 
 {
@@ -27,13 +29,21 @@ public class PDFGenerator
     protected static FileWriter fw = null;
     protected static ArrayList<String> slctkeysArr = new ArrayList<String>();
     protected static ArrayList<String> otherkeysArr = new ArrayList<String>();
+    protected static HttpHandle http = null;
     protected static boolean flag = true;
     protected static boolean image_flag = true;	protected static BufferedReader reader;
 	protected static String Pdf;
 	protected static String SourceString;
 	protected static HashMap<String, String> Hashmap;
 	
-	public static void GeneratePDF(String ModifiedXML, String OriginalXML, String DataFeededXML, HashMap<String, String> Hashmap) throws IOException 
+	public static void main(String[] args) throws IOException, HTTPHandleException 
+	{
+		HashMap<String,String> hm=new HashMap<String,String>();  
+		hm.put("ISO_BOP_Policy_Number","Amit");  
+		GeneratePDF("C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\vicky.xml","C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\pdfservicesolartisnet_1510893129634_83_request.xml","C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\tohit1.xml", hm);
+	}
+	
+	public static void GeneratePDF(String ModifiedXML, String OriginalXML, String DataFeededXML, HashMap<String, String> Hashmap) throws IOException, HTTPHandleException 
 	{
 		String Value = null;
 		List<String> ValueList = new ArrayList<String> ();
@@ -61,11 +71,12 @@ public class PDFGenerator
 		int PDF_start = buf.lastIndexOf("&lt;?xml"); 
 		int PDF_end = buf.indexOf("&lt;/PDF&gt;");
 		buf.replace(PDF_start, PDF_end+12, SourceString); 
-
+		
 		BufferedWriter bwr = new BufferedWriter(new FileWriter(new File(DataFeededXML)));
 	    bwr.write(buf.toString());
 	    bwr.flush();
 	    bwr.close();
+	    HTTPRequester(buf.toString());
 		System.out.println("Success");
 	}
 	
@@ -220,5 +231,14 @@ public class PDFGenerator
 			}
 		}
 		return str;
+	}
+	
+	private static void HTTPRequester(String PDF) throws HTTPHandleException
+	{
+		http = new HttpHandle("https://qapdfservice.solartis.net/PDFGenerationService-3.0/PDFGenerationService/3_0/generatePDF","POST");
+		http.AddHeader("Content-Type", "application/xml");
+		http.SendData(PDF);
+		String response_string = http.ReceiveData();
+		System.out.println(response_string);
 	}
 }
