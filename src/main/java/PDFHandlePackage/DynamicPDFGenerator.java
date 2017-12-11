@@ -1,10 +1,7 @@
 package PDFHandlePackage;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,7 +28,10 @@ public class DynamicPDFGenerator
 	protected static ConditionsChecking cond_check = null;
 	protected static HttpHandle http = null;
 	protected static String inputfilepath = "C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\pdfservicesolartisnet_1510893129634_83_request.xml";
-	private static String PdfPath;
+	private static String expectedPdfPath;
+	private static String actualPdfPath;
+	private static String resultPdfPath;
+	private static String actualPdfURL;
 	private static PDFComparision pdfcompare;
 	
 	@SuppressWarnings("static-access")
@@ -69,7 +69,8 @@ public class DynamicPDFGenerator
 			HTTPRequester(buf_to_change_XMLSource.toString());
 		}*/
 		DynamicPDFGenerator1(ConditionTable,InputTable,XMlSource_tag_table,inputfilepath);
-		pdfcompare.comparePDFVisually(PdfPath, "", "");
+		
+		
 	}
 	public static void DynamicPDFGenerator1(LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable, LinkedHashMap<Integer, LinkedHashMap<String, String>> InputTable, LinkedHashMap<Integer, LinkedHashMap<String, String>> XMlSource_tag_table, String inputFilepath ) throws DatabaseException, IOException, HTTPHandleException
 	{
@@ -87,8 +88,12 @@ public class DynamicPDFGenerator
 			String result = HTTPRequester(buf_to_change_XMLSource.toString());
 			int start = result.indexOf("<PdfFileName>");
 			int end = result.indexOf("</PdfFileName>");
-			PdfPath="A:\\" + result.substring(start+13, end);
+			expectedPdfPath="A:\\" + result.substring(start+13, end);
 			System.out.println("A:\\" + result.substring(start+13, end));
+			actualPdfURL=inputRow_hashMap.get("Issurance_PDF");
+			actualPdfPath="B:/ActualPDF"+inputRow_hashMap.get("TestData");
+			resultPdfPath="B:/ResultPDF"+inputRow_hashMap.get("TestData");
+			pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
 		}
 	}
 	
@@ -166,7 +171,6 @@ public class DynamicPDFGenerator
 		return TemplateString;
 	}
 	
-	@SuppressWarnings("unused")
 	private static LinkedHashMap<String, String> prepareHashMap_DynamicXMLSource(LinkedHashMap<String, String> Input_Rs,LinkedHashMap<Integer, LinkedHashMap<String, String>> XMLSource_tag)
 	{
 		    LinkedHashMap<String,String> DynamicXMLSource =new LinkedHashMap<String,String>();  

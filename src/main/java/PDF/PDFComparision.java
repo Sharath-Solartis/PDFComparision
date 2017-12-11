@@ -20,12 +20,14 @@ public class PDFComparision
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public void comparePDFVisually(String PDF1, String PDF2, String Resultpath) throws IOException
+	public void comparePDFVisually(String PDF1path, String PDF2URL,String PDF2pathwithpdfname, String Resultpath) throws IOException
 	{
-		PdfComparator pdfcompare = new PdfComparator(PDF1, PDF2);
+		//PDF2path = "B:/ActualPDF";
+		urltopdf(PDF2URL,PDF2pathwithpdfname);
+		PdfComparator pdfcompare = new PdfComparator(PDF1path, PDF2pathwithpdfname+".pdf");
 		pdfcompare.compare().writeTo(Resultpath);
 		System.out.println(pdfcompare.getResult());
-        boolean isEqual=new PdfComparator(PDF1, PDF2).compare().writeTo(Resultpath);
+        boolean isEqual=new PdfComparator(PDF1path, PDF2pathwithpdfname+".pdf").compare().writeTo(Resultpath);
         if(!isEqual)
         {
             System.out.println("Difference found in PDFs");
@@ -36,21 +38,21 @@ public class PDFComparision
         }
 	}
 	
-	public void urltopdf(String URL,String path,String filename) throws IOException
+	public void urltopdf(String URL,String path) throws IOException
 	{
 		System.setProperty("jsse.enableSNIExtension", "false");	
 		URL website = new URL(URL);
-		Path targetPath = new File(path + File.separator + filename+".pdf").toPath();
+		Path targetPath = new File(path+".pdf").toPath();
 		InputStream in = website.openStream();		
 		Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);		
 	}
 	
 	public static void main(String args[]) throws SAXException, IOException
 	{
-		PDFComparision comp = new PDFComparision();
-		String pdfpath1="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0017NH.pdf";
-		String pdfpath2="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0114OW.pdf";
-		comp.comparePDFVisually(pdfpath1,pdfpath2,"D:/ftl/");
+		//PDFComparision comp = new PDFComparision();
+		//String pdfpath1="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0017NH.pdf";
+		//String pdfpath2="Q:/Manual Testing/Starr/Starr-GL/FormsTemplate/All Forms/IL0114OW.pdf";
+		//comp.comparePDFVisually(pdfpath1,pdfpath2,"D:/ftl/");
 		//comp.
 		//comp.urltopdf("D:/ftl/");	
 	
