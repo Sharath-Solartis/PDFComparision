@@ -80,7 +80,10 @@ public class DynamicPDFGenerator
 			int TOChange_XmlSource_start = buf_to_change_XMLSource.indexOf("<XmlSource>"); 
 			int TOChange_PDF_end = buf_to_change_XMLSource.indexOf("</XmlSource>");
 			buf_to_change_XMLSource.replace(TOChange_XmlSource_start+11, TOChange_PDF_end, XMl_Request_with_XMlSource);
-			HTTPRequester(buf_to_change_XMLSource.toString());
+			String result = HTTPRequester(buf_to_change_XMLSource.toString());
+			int start = result.indexOf("<PdfFileName>");
+			int end = result.indexOf("</PdfFileName>");
+			System.out.println("A:\\" + result.substring(start+13, end));
 		}
 	}
 	
@@ -214,13 +217,14 @@ public class DynamicPDFGenerator
 		return ReV_XmlSource.replace("15", "1");
     }
 	
-	private static void HTTPRequester(String PDF) throws HTTPHandleException
+	private static String HTTPRequester(String PDF) throws HTTPHandleException
 	{
 		http = new HttpHandle("https://qapdfservice.solartis.net/PDFGenerationService-3.0/PDFGenerationService/3_0/generatePDF","POST");
 		http.AddHeader("Content-Type", "application/xml");
 		http.SendData(PDF);
 		String response_string = http.ReceiveData();
-		System.out.println(response_string);
+		//System.out.println(response_string);
+		return response_string;
 	}
 	
 	@SuppressWarnings("unused")
