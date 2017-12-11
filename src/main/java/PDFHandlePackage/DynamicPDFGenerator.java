@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 
+import PDF.PDFComparision;
 import PDFHandleException.DatabaseException;
 import PDFHandleException.HTTPHandleException;
 
@@ -30,6 +31,8 @@ public class DynamicPDFGenerator
 	protected static ConditionsChecking cond_check = null;
 	protected static HttpHandle http = null;
 	protected static String inputfilepath = "C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\pdfservicesolartisnet_1510893129634_83_request.xml";
+	private static String PdfPath;
+	private static PDFComparision pdfcompare;
 	
 	@SuppressWarnings("static-access")
 	public static void main(String[] args) throws IOException, DatabaseException, HTTPHandleException 
@@ -38,6 +41,7 @@ public class DynamicPDFGenerator
 		db_obj = new DatabaseOperation();
 		cond_check = new ConditionsChecking();
 		db_obj.ConnectionSetup("com.mysql.jdbc.Driver", "jdbc:mysql://192.168.35.2:3391/Aa", "root", "password");
+		pdfcompare = new PDFComparision();
 		
 		LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable = db_obj.GetDataObjects("SELECT * FROM List_Forms_Condition");
 		LinkedHashMap<Integer, LinkedHashMap<String, String>> InputTable = db_obj.GetDataObjects("SELECT * FROM STARR_BOP_Quote_Policy_Endrosement_Cancel_INPUT t1 JOIN OUTPUT_ISO_Quote t2 JOIN OUTPUT_ISO_PolicyIssuance t3 ON t1.`S.No` = t2.`S.No` AND t2.`S.No` = t3.`S.No`");
@@ -65,7 +69,7 @@ public class DynamicPDFGenerator
 			HTTPRequester(buf_to_change_XMLSource.toString());
 		}*/
 		DynamicPDFGenerator1(ConditionTable,InputTable,XMlSource_tag_table,inputfilepath);
- 
+		pdfcompare.comparePDFVisually(PdfPath, "", "");
 	}
 	public static void DynamicPDFGenerator1(LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable, LinkedHashMap<Integer, LinkedHashMap<String, String>> InputTable, LinkedHashMap<Integer, LinkedHashMap<String, String>> XMlSource_tag_table, String inputFilepath ) throws DatabaseException, IOException, HTTPHandleException
 	{
@@ -83,6 +87,7 @@ public class DynamicPDFGenerator
 			String result = HTTPRequester(buf_to_change_XMLSource.toString());
 			int start = result.indexOf("<PdfFileName>");
 			int end = result.indexOf("</PdfFileName>");
+			PdfPath="A:\\" + result.substring(start+13, end);
 			System.out.println("A:\\" + result.substring(start+13, end));
 		}
 	}
