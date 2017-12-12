@@ -85,6 +85,10 @@ public class DynamicPDFGenerator
 			int TOChange_XmlSource_start = buf_to_change_XMLSource.indexOf("<XmlSource>"); 
 			int TOChange_PDF_end = buf_to_change_XMLSource.indexOf("</XmlSource>");
 			buf_to_change_XMLSource.replace(TOChange_XmlSource_start+11, TOChange_PDF_end, XMl_Request_with_XMlSource);
+			BufferedWriter bwr = new BufferedWriter(new FileWriter(new File("C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\Output.xml")));
+		    bwr.write(buf_to_change_XMLSource.toString());
+		    bwr.flush();
+		    bwr.close();
 			String result = HTTPRequester(buf_to_change_XMLSource.toString());
 			int start = result.indexOf("<PdfFileName>");
 			int end = result.indexOf("</PdfFileName>");
@@ -129,8 +133,9 @@ public class DynamicPDFGenerator
 			LinkedHashMap<String, String> ScheduleOfForms = Forms.getValue();
 			for (Entry<String, String> ScheduleOfForms_name_num : ScheduleOfForms.entrySet() ) 
 			{
-				String ScheduleOfForms_Name = EscapeChar_XSLT(ScheduleOfForms_name_num.getKey());
-				String ScheduleOfForms_Number = EscapeChar_XSLT(ScheduleOfForms_name_num.getValue());	    
+				String ScheduleOfForms_Name = EscapeChar_XSLT_XMLSource(ScheduleOfForms_name_num.getKey());
+				String ScheduleOfForms_Number = EscapeChar_XSLT_XMLSource(ScheduleOfForms_name_num.getValue());	 
+				
 				if(forms_flag == true && !FormsNameTo_Attach_key.isEmpty())
 				{
 					formTemplete_tmpString ="\n\t    <FormTemplate>\n\t" + "\t    <FormLocation>"+FormsNameTo_Attach+"</FormLocation>\n" + "\t    </FormTemplate>";
@@ -222,7 +227,7 @@ public class DynamicPDFGenerator
 		String ReV_XmlSource = rev_buf.substring(0,rev_buf.length());
 		ReV_XmlSource = ReV_XmlSource.replace("<", "&lt;");
 		ReV_XmlSource = ReV_XmlSource.replace(">","&gt;");
-		//System.out.println(ReV_XmlSource);
+	    //System.out.println(ReV_XmlSource.replace("15", "1"));
 		return ReV_XmlSource.replace("15", "1");
     }
 	
@@ -281,7 +286,7 @@ public class DynamicPDFGenerator
 	{
 		if(value.contains("&"))
 		{
-			value = value.replaceAll("&'", "&amp;amp;");
+			value = value.replaceAll("&", "&amp;amp;");
 		}
 		return value;
 	}
