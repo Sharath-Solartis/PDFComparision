@@ -14,6 +14,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.version>1.8</jdk.version>
   </properties>
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -21,68 +22,123 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    
     <!-- https://mvnrepository.com/artifact/com.snowtide/lucene-pdf -->
 	<dependency>
 	    <groupId>com.snowtide</groupId>
 	    <artifactId>lucene-pdf</artifactId>
 	    <version>3.0.0</version>
 	</dependency>
+	
 	<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-core -->
-<dependency>
-    <groupId>org.xmlunit</groupId>
-    <artifactId>xmlunit-core</artifactId>
-    <version>2.5.0</version>
-    <scope>test</scope>
-</dependency>
+	<dependency>
+	    <groupId>org.xmlunit</groupId>
+	    <artifactId>xmlunit-core</artifactId>
+	    <version>2.5.0</version>
+	    <scope>test</scope>
+	</dependency>
 
-<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-legacy -->
-<dependency>
-    <groupId>org.xmlunit</groupId>
-    <artifactId>xmlunit-legacy</artifactId>
-    <version>2.5.0</version>
-    <scope>test</scope>
-</dependency>
-<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-parent -->
-<dependency>
-    <groupId>org.xmlunit</groupId>
-    <artifactId>xmlunit-parent</artifactId>
-    <version>2.5.0</version>
-    <type>pom</type>
-</dependency>
+	<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-legacy -->
+	<dependency>
+	    <groupId>org.xmlunit</groupId>
+	    <artifactId>xmlunit-legacy</artifactId>
+	    <version>2.5.0</version>
+	    <scope>test</scope>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-parent -->
+	<dependency>
+	    <groupId>org.xmlunit</groupId>
+	    <artifactId>xmlunit-parent</artifactId>
+	    <version>2.5.0</version>
+	    <type>pom</type>
+	</dependency>
 
-<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-matchers -->
-<dependency>
-    <groupId>org.xmlunit</groupId>
-    <artifactId>xmlunit-matchers</artifactId>
-    <version>2.2.1</version>
-    <scope>test</scope>
-</dependency>
+	<!-- https://mvnrepository.com/artifact/org.xmlunit/xmlunit-matchers -->
+	<dependency>
+	    <groupId>org.xmlunit</groupId>
+	    <artifactId>xmlunit-matchers</artifactId>
+	    <version>2.2.1</version>
+	    <scope>test</scope>
+	</dependency>
+	
 	<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 	<dependency>
 	    <groupId>org.apache.logging.log4j</groupId>
 	    <artifactId>log4j-core</artifactId>
 	    <version>2.8.2</version>
 	</dependency>
+	
 	<!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
 	<dependency>
     	<groupId>dom4j</groupId>
     	<artifactId>dom4j</artifactId>
     	<version>1.6.1</version>
 	</dependency>
+	
 	<dependency>
-    <groupId>org.jsoup</groupId>
-    <artifactId>jsoup</artifactId>
-    <version>1.8.3</version>
-</dependency>
+	    <groupId>org.jsoup</groupId>
+	    <artifactId>jsoup</artifactId>
+	    <version>1.8.3</version>
+	</dependency>
+	
 	<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>5.1.39</version>
-</dependency>
-<dependency>
-    <groupId>de.redsix</groupId>
-    <artifactId>pdfcompare</artifactId>
-    <version>1.1.25</version>
-  </dependency>
+	    <groupId>mysql</groupId>
+	    <artifactId>mysql-connector-java</artifactId>
+	    <version>5.1.39</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>de.redsix</groupId>
+	    <artifactId>pdfcompare</artifactId>
+	    <version>1.1.25</version>
+	  </dependency>
+	  
   </dependencies>
+  
+  <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>PDF.DynamicPDFComparision</mainClass>
+                    <systemPropertyVariables>
+                                <FormsConditionalTable>${FormsConditionalTable}</FormsConditionalTable>
+                                <XmlSourceTable>${XmlSourceTable}</XmlSourceTable>
+                                <InputTable>${InputTable}</InputTable>
+                                <OutputQuoteTable>${OutputQuoteTable}</OutputQuoteTable>
+                                <OutputPolicyTable>${OutputPolicyTable}</OutputPolicyTable>
+                                <JDBC_DRIVER>${JDBC_DRIVER}</JDBC_DRIVER>
+                                <DB_URL>${DB_URL}</DB_URL>
+                                <USER>${USER}</USER>
+                                <password>${password}</password>
+                                <TransactionType>${TransactionType}</TransactionType>
+                                <SamplePDFRequest>${SamplePDFRequest}</SamplePDFRequest>
+                                <ActualPDFPath>${ActualPDFPath}</ActualPDFPath>
+                                <ResultPDFPath>${ResultPDFPath}</ResultPDFPath>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            
+        </plugins>
+    </build>
+  
 </project>

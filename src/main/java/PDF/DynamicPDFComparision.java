@@ -24,24 +24,26 @@ public class DynamicPDFComparision
 	public static void main(String args[]) throws DatabaseException, IOException, HTTPHandleException
 	{
 		db_obj = new DatabaseOperation();
-		db_obj.ConnectionSetup("com.mysql.jdbc.Driver", "jdbc:mysql://192.168.35.2:3391/Aa", "root", "password");
+		db_obj.ConnectionSetup(System.getProperty("JDBC_DRIVER"), System.getProperty("DB_URL"), System.getProperty("USER"), System.getProperty("password"));
 		pdfcompare = new PDFComparision();
 		DynamicPDF = new DynamicPDFGenerator();
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable = db_obj.GetDataObjects("SELECT * FROM List_Forms_Condition");
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> InputTable = db_obj.GetDataObjects("SELECT * FROM STARR_BOP_Quote_Policy_Endrosement_Cancel_INPUT t1 JOIN OUTPUT_ISO_Quote t2 JOIN OUTPUT_ISO_PolicyIssuance t3 ON t1.`S.No` = t2.`S.No` AND t2.`S.No` = t3.`S.No`");
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> XMlSource_tag_table = db_obj.GetDataObjects("SELECT * FROM XML_Source_Table");
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable = db_obj.GetDataObjects("SELECT * FROM " + System.getProperty("FormsConditionalTable"));
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> XMlSource_tag_table = db_obj.GetDataObjects("SELECT * FROM "+ System.getProperty("XmlSourceTable"));
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> InputTable = db_obj.GetDataObjects("SELECT * FROM "+ System.getProperty("InputTable") +" t1 JOIN "+ System.getProperty("OutputQuoteTable") +" t2 JOIN "+ System.getProperty("OutputPolicyTable") +" t3 ON t1.`S.No` = t2.`S.No` AND t2.`S.No` = t3.`S.No`");
 		
 		for (Map.Entry<Integer, LinkedHashMap<String, String>> Input : InputTable.entrySet() ) 
 		{
-			System.out.println("TestData--1");
+			LinkedHashMap<String, String> inputrow = Input.getValue();
+			expectedPdfPath = DynamicPDF.PDFGenerator(ConditionTable, Input, XMlSource_tag_table, System.getProperty("SamplePDFRequest"), System.getProperty("TransactionType"));
+			System.out.println(expectedPdfPath);
 			
-			expectedPdfPath = DynamicPDF.PDFGenerator(ConditionTable, Input, XMlSource_tag_table, inputfilepath);
-					
-			actualPdfURL=Input.getValue().get("Issurance_PDF");
-			actualPdfPath="E:\\Jmeter-server\\STARR_BOP-PaaS\\Request_Response\\ActualPDF\\"+Input.getValue().get("Testdata");
-			resultPdfPath="E:\\Jmeter-server\\STARR_BOP-PaaS\\Request_Response\\ResultPDF\\"+Input.getValue().get("Testdata");
-			
-			pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
+			/*actualPdfURL=Input.getValue().get("Issurance_PDF");
+			actualPdfPath= System.getProperty("ActualPDFPath")+ Input.getValue().get("Testdata");
+			resultPdfPath= System.getProperty("ResultPDFPath") + Input.getValue().get("Testdata");
+
+		    String status=	pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
+		    inputrow.put("Status", status);
+		    db_obj.UpdateRow(Integer.parseInt(Input.getValue().get("S.No")), inputrow);*/
 		}
 	}
 }

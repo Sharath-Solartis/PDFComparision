@@ -20,8 +20,9 @@ public class PDFComparision
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public void comparePDFVisually(String PDF1path, String PDF2URL,String PDF2pathwithpdfname, String Resultpath) throws IOException
+	public String comparePDFVisually(String PDF1path, String PDF2URL,String PDF2pathwithpdfname, String Resultpath) throws IOException
 	{
+		String result;
 		//PDF2path = "B:/ActualPDF";
 		urltopdf(PDF2URL,PDF2pathwithpdfname);
 		PdfComparator pdfcompare = new PdfComparator(PDF1path, PDF2pathwithpdfname+".pdf");
@@ -31,11 +32,14 @@ public class PDFComparision
         if(!isEqual)
         {
             System.out.println("Difference found in PDFs");
+            result = "Pass";
         }
         else
         {
             System.out.println("Difference not found in PDFs");
+            result = "Fail";
         }
+        return result;
 	}
 	
 	public void urltopdf(String URL,String path) throws IOException

@@ -26,72 +26,31 @@ public class DynamicPDFGenerator
 	protected static HttpHandle http = null;
 	protected static String inputfilepath = "C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\pdfservicesolartisnet_1510893129634_83_request.xml";
 	
-	/*@SuppressWarnings("static-access")
-	public static void main(String[] args) throws IOException, DatabaseException, HTTPHandleException 
-	{
-		Source = new DynamicXMLGenrator();
-		db_obj = new DatabaseOperation();
-		cond_check = new ConditionsChecking();
-		db_obj.ConnectionSetup("com.mysql.jdbc.Driver", "jdbc:mysql://192.168.35.2:3391/Aa", "root", "password");
-		pdfcompare = new PDFComparision();
-		
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable = db_obj.GetDataObjects("SELECT * FROM List_Forms_Condition");
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> InputTable = db_obj.GetDataObjects("SELECT * FROM STARR_BOP_Quote_Policy_Endrosement_Cancel_INPUT t1 JOIN OUTPUT_ISO_Quote t2 JOIN OUTPUT_ISO_PolicyIssuance t3 ON t1.`S.No` = t2.`S.No` AND t2.`S.No` = t3.`S.No`");
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> XMlSource_tag_table = db_obj.GetDataObjects("SELECT * FROM XML_Source_Table");
-		DynamicPDFGenerator1(ConditionTable,InputTable,XMlSource_tag_table,inputfilepath);
-		
-	}*/
-	
-	public static String PDFGenerator(LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable, Map.Entry<Integer, LinkedHashMap<String, String>> InputTable, LinkedHashMap<Integer, LinkedHashMap<String, String>> XMlSource_tag_table, String inputFilepath ) throws DatabaseException, IOException, HTTPHandleException
+	public static String PDFGenerator(LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable, Map.Entry<Integer, LinkedHashMap<String, String>> InputTable, LinkedHashMap<Integer, LinkedHashMap<String, String>> XMlSource_tag_table, String inputFilepath , String TransactionType ) throws DatabaseException, IOException, HTTPHandleException
 	{
 		cond_check = new ConditionsChecking();
 		LinkedHashMap<String, String> inputRow_hashMap = InputTable.getValue(); //TO GET A ROW OF TESTDATA
 		LinkedHashMap<String, LinkedHashMap<String, String>> FormsList = ListOfForms(inputRow_hashMap,ConditionTable);//IT RETURN LIST FORM TO ATTACH
-		String XMl_Request_with_listof_forms = AddingForm_Request(FormsList, inputFilepath); //IT WILL RETURN A STRING WITH LIST OF FORMS AND SCHEDULE FORMS 
+		String XMl_Request_with_listof_forms = AddingForm_Request(FormsList, inputFilepath, TransactionType); //IT WILL RETURN A STRING WITH LIST OF FORMS AND SCHEDULE FORMS 
 		LinkedHashMap<String, String> Dynamic_XMLSource = prepareHashMap_DynamicXMLSource(inputRow_hashMap,XMlSource_tag_table); // IT WILL RETURN HASHMAP WITH XMLSOURCE TAG AND RESPECTIVELY VALUES
 		String XMl_Request_with_XMlSource= XMlSourceGenerator(XMl_Request_with_listof_forms, Dynamic_XMLSource);// IT RETURN DYNAMIC PDF REQUEST
 		StringBuffer buf_to_change_XMLSource = new StringBuffer(XMl_Request_with_listof_forms);
-		int TOChange_XmlSource_start = buf_to_change_XMLSource.indexOf("<XmlSource>"); 
+
+		int TOChange_XmlSource_start = buf_to_change_XMLSource.indexOf("<XmlSource>")+11; 
 		int TOChange_PDF_end = buf_to_change_XMLSource.indexOf("</XmlSource>");
-		buf_to_change_XMLSource.replace(TOChange_XmlSource_start+11, TOChange_PDF_end, XMl_Request_with_XMlSource);
+		buf_to_change_XMLSource.replace(TOChange_XmlSource_start, TOChange_PDF_end, XMl_Request_with_XMlSource);
+		//System.out.println(buf_to_change_XMLSource.toString());
+		
 		/*BufferedWriter bwr = new BufferedWriter(new FileWriter(new File("C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\Output.xml")));
 	    bwr.write(buf_to_change_XMLSource.toString());
 	    bwr.flush();
 	    bwr.close();*/
 		String result = HTTPRequester(buf_to_change_XMLSource.toString());
+		//System.out.println(buf_to_change_XMLSource.toString());
 		int start = result.indexOf("<PdfFileName>");
 		int end = result.indexOf("</PdfFileName>");
 		return("A:\\" + result.substring(start+13, end));
 	}
-	
-	/*public static void DynamicPDFGenerator1(LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable, LinkedHashMap<Integer, LinkedHashMap<String, String>> InputTable, LinkedHashMap<Integer, LinkedHashMap<String, String>> XMlSource_tag_table, String inputFilepath ) throws DatabaseException, IOException, HTTPHandleException
-	{
-		for (Map.Entry<Integer, LinkedHashMap<String, String>> inputRow : InputTable.entrySet() ) 
-		{
-			LinkedHashMap<String, String> inputRow_hashMap = inputRow.getValue(); //TO GET A ROW OF TESTDATA
-			LinkedHashMap<String, LinkedHashMap<String, String>> FormsList = ListOfForms(inputRow_hashMap,ConditionTable);//IT RETURN LIST FORM TO ATTACH
-			String XMl_Request_with_listof_forms = AddingForm_Request(FormsList, inputFilepath); //IT WILL RETURN A STRING WITH LIST OF FORMS AND SCHEDULE FORMS 
-			LinkedHashMap<String, String> Dynamic_XMLSource = prepareHashMap_DynamicXMLSource(inputRow_hashMap,XMlSource_tag_table); // IT WILL RETURN HASHMAP WITH XMLSOURCE TAG AND RESPECTIVELY VALUES
-			String XMl_Request_with_XMlSource= XMlSourceGenerator(XMl_Request_with_listof_forms, Dynamic_XMLSource);// IT RETURN DYNAMIC PDF REQUEST
-			StringBuffer buf_to_change_XMLSource = new StringBuffer(XMl_Request_with_listof_forms);
-			int TOChange_XmlSource_start = buf_to_change_XMLSource.indexOf("<XmlSource>"); 
-			int TOChange_PDF_end = buf_to_change_XMLSource.indexOf("</XmlSource>");
-			buf_to_change_XMLSource.replace(TOChange_XmlSource_start+11, TOChange_PDF_end, XMl_Request_with_XMlSource);
-			BufferedWriter bwr = new BufferedWriter(new FileWriter(new File("C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\Output.xml")));
-		    bwr.write(buf_to_change_XMLSource.toString());
-		    bwr.flush();
-		    bwr.close();
-			String result = HTTPRequester(buf_to_change_XMLSource.toString());
-			int start = result.indexOf("<PdfFileName>");
-			int end = result.indexOf("</PdfFileName>");
-			expectedPdfPath="A:\\" + result.substring(start+13, end);
-			System.out.println("A:\\" + result.substring(start+13, end));
-			actualPdfURL=inputRow_hashMap.get("Issurance_PDF");
-			actualPdfPath="E:\\Jmeter-server\\STARR_BOP-PaaS\\Request_Response\\ActualPDF\\"+inputRow_hashMap.get("Testdata");
-			resultPdfPath="E:\\Jmeter-server\\STARR_BOP-PaaS\\Request_Response\\ResultPDF\\"+inputRow_hashMap.get("Testdata");
-			pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
-		}
-	}*/
 	
 	private static LinkedHashMap<String, LinkedHashMap<String, String>> ListOfForms(LinkedHashMap<String, String> inputRow_hashMap,LinkedHashMap<Integer, LinkedHashMap<String, String>> ConditionTable) throws DatabaseException
     {
@@ -116,7 +75,7 @@ public class DynamicPDFGenerator
     }
 	
 	@SuppressWarnings("static-access")
-	private static String AddingForm_Request(LinkedHashMap<String, LinkedHashMap<String, String>> FormsList, String inputpath) throws IOException
+	private static String AddingForm_Request(LinkedHashMap<String, LinkedHashMap<String, String>> FormsList, String inputpath, String TransactnType) throws IOException
 	{
 		for (Map.Entry<String, LinkedHashMap<String, String>> Forms : FormsList.entrySet() ) 
 		{
@@ -125,8 +84,8 @@ public class DynamicPDFGenerator
 			LinkedHashMap<String, String> ScheduleOfForms = Forms.getValue();
 			for (Entry<String, String> ScheduleOfForms_name_num : ScheduleOfForms.entrySet() ) 
 			{
-				String ScheduleOfForms_Name = EscapeChar_XSLT_XMLSource(ScheduleOfForms_name_num.getKey());
-				String ScheduleOfForms_Number = EscapeChar_XSLT_XMLSource(ScheduleOfForms_name_num.getValue());	 
+				String ScheduleOfForms_Name = EscapeChar_XSLT_XMLSource(ScheduleOfForms_name_num.getKey()).trim();
+				String ScheduleOfForms_Number = EscapeChar_XSLT_XMLSource(ScheduleOfForms_name_num.getValue()).trim();	 
 				
 				if(forms_flag == true && !FormsNameTo_Attach_key.isEmpty())
 				{
@@ -137,13 +96,15 @@ public class DynamicPDFGenerator
 				{
 					formTemplete_tmpString = formTemplete_tmpString + "\n\t    <FormTemplate>\n\t" + "\t    <FormLocation>"+FormsNameTo_Attach+"</FormLocation>\n" + "\t    </FormTemplate>";
 				}
-				if(Scheduleforms_flag == true && !ScheduleOfForms_Number.isEmpty() && !ScheduleOfForms_Name.isEmpty())
+				if(Scheduleforms_flag == true && !ScheduleOfForms_Number.isEmpty() && !ScheduleOfForms_Name.isEmpty() && TransactnType.equalsIgnoreCase("NewBusiness"))
 				{
+					//System.out.println(ScheduleOfForms_Number + "===" + ScheduleOfForms_Name);
 					ScheduleOfFormsList_tmpString ="&lt;ISO_BOP_ScheduleOfFormsList&gt;&lt;ISO_BOP_Form_Number&gt;"+ ScheduleOfForms_Number +"&lt;/ISO_BOP_Form_Number&gt;&lt;ISO_BOP_Form_Name&gt;"+ScheduleOfForms_Name+"&lt;/ISO_BOP_Form_Name&gt;&lt;/ISO_BOP_ScheduleOfFormsList&gt;";
 					Scheduleforms_flag = false;
 				}
-				else if(!ScheduleOfForms_Number.isEmpty() && !ScheduleOfForms_Name.isEmpty())
+				else if(!ScheduleOfForms_Number.isEmpty() && !ScheduleOfForms_Name.isEmpty() && TransactnType.equalsIgnoreCase("NewBusiness"))
 				{
+					//System.out.println(ScheduleOfForms_Number + "===" + ScheduleOfForms_Name);
 					ScheduleOfFormsList_tmpString = ScheduleOfFormsList_tmpString + "&lt;ISO_BOP_ScheduleOfFormsList&gt;&lt;ISO_BOP_Form_Number&gt;"+ ScheduleOfForms_Number +"&lt;/ISO_BOP_Form_Number&gt;&lt;ISO_BOP_Form_Name&gt;"+ScheduleOfForms_Name+"&lt;/ISO_BOP_Form_Name&gt;&lt;/ISO_BOP_ScheduleOfFormsList&gt;";
 				}
 			}
@@ -156,12 +117,16 @@ public class DynamicPDFGenerator
 		buf.replace(PDF_start+15, PDF_end, formTemplete_tmpString);
 		String value = buf.toString();
 		
-		buf.delete(0, buf.length());
-		
-		buf = new StringBuffer(value);
-		int ScheduleOfFormsList_start = buf.indexOf("&lt;PDF&gt;");
-		buf.replace(ScheduleOfFormsList_start+11,ScheduleOfFormsList_start+11, ScheduleOfFormsList_tmpString);
-		
+		if(TransactnType.equalsIgnoreCase("NewBusiness"))
+		{
+			buf.delete(0, buf.length());
+			
+			buf = new StringBuffer(value);
+			int ScheduleOfFormsList_start = buf.indexOf("&lt;PDF&gt;");
+			buf.replace(ScheduleOfFormsList_start+11,ScheduleOfFormsList_start+11, ScheduleOfFormsList_tmpString);
+			
+			//System.out.println(TemplateString);
+		}
 		String TemplateString = buf.toString();
 		return TemplateString;
 	}
@@ -186,6 +151,7 @@ public class DynamicPDFGenerator
 		int PDF_start = buf.indexOf("<XmlSource>"); 
 		int PDF_end = buf.indexOf("</XmlSource>");
 		String XmlSource = buf.substring(PDF_start+11, PDF_end);
+		
 		XmlSource = XmlSource.replace("&lt;","<");
 		XmlSource = XmlSource.replace("&gt;",">");
 		
@@ -201,17 +167,21 @@ public class DynamicPDFGenerator
 					if(!oldChar.isEmpty() && !XmlSoruce_value.isEmpty())
 					{
 						e.text(e.text().replace(e.ownText(), XmlSoruce_value));
+						XmlSource = XmlSource.replace(XmlSoruce_tag + ">" + oldChar, XmlSoruce_tag + ">" + e.ownText());
 					}
-					XmlSource = XmlSource.replace(oldChar, e.ownText());
 				}
 			}
 		StringBuffer rev_buf = new StringBuffer(XmlSource);
+		
 		int ReV_PDF_start = rev_buf.indexOf("<XmlSource>"); 
 		int ReV_PDF_end = rev_buf.indexOf("</PDF>");
 		String ReV_XmlSource = rev_buf.substring(0,rev_buf.length());
 		ReV_XmlSource = ReV_XmlSource.replace("<", "&lt;");
 		ReV_XmlSource = ReV_XmlSource.replace(">","&gt;");
-		return ReV_XmlSource.replace("15", "1");
+	    //ReV_XmlSource = ReV_XmlSource.replace("15", "1");
+		//ReV_XmlSource = ReV_XmlSource.replace("1", "2");
+		
+		return ReV_XmlSource;
     }
 	
 	private static String HTTPRequester(String PDF) throws HTTPHandleException

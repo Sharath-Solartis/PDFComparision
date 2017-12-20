@@ -17,7 +17,6 @@ public class ConditionsChecking extends DatabaseOperation
 	protected boolean ConditionReading(String condition,LinkedHashMap<String, String> row) throws DatabaseException
 	{
 		boolean ConditionReading=false;
-		
 			if(condition.equals(""))
 			{
 				ConditionReading=true;
@@ -189,7 +188,7 @@ public class ConditionsChecking extends DatabaseOperation
 												DateValueFormDB = row.get(cond).split("-");
 												Date cDate = new Date(Integer.parseInt(DateValue[0]),Integer.parseInt(DateValue[1]),Integer.parseInt(DateValue[2]));  
 										        Date Effdate= new Date(Integer.parseInt(DateValueFormDB[0]),Integer.parseInt(DateValueFormDB[1]),Integer.parseInt(DateValueFormDB[2]));
-										        if (Effdate.compareTo(cDate)<0 || Effdate.compareTo(cDate)==0)
+										        if (Effdate.compareTo(cDate)>0 || Effdate.compareTo(cDate)==0) 
 										        	ConditionReading=true;
 										        else
 										        	ConditionReading=false; 
@@ -201,7 +200,7 @@ public class ConditionsChecking extends DatabaseOperation
 												DateValueFormDB = row.get(cond).split("-");
 												Date cDate = new Date(Integer.parseInt(DateValue[0]),Integer.parseInt(DateValue[1]),Integer.parseInt(DateValue[2]));  
 										        Date Effdate= new Date(Integer.parseInt(DateValueFormDB[0]),Integer.parseInt(DateValueFormDB[1]),Integer.parseInt(DateValueFormDB[2]));
-										        if (Effdate.compareTo(cDate)>0 || Effdate.compareTo(cDate)==0)
+										        if (Effdate.compareTo(cDate)<0 || Effdate.compareTo(cDate)==0)
 										        	ConditionReading=true;
 										        else
 										        	ConditionReading=false; 
