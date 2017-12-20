@@ -33,6 +33,7 @@ public class DynamicPDFComparision
 		
 		for (Map.Entry<Integer, LinkedHashMap<String, String>> Input : InputTable.entrySet() ) 
 		{
+			System.out.println(Input.getValue().get("Testdata") + " is Running");
 			LinkedHashMap<String, String> inputrow = Input.getValue();
 			expectedPdfPath = DynamicPDF.PDFGenerator(ConditionTable, Input, XMlSource_tag_table, System.getProperty("SamplePDFRequest"), System.getProperty("TransactionType"));
 			System.out.println(expectedPdfPath);
@@ -40,10 +41,11 @@ public class DynamicPDFComparision
 			/*actualPdfURL=Input.getValue().get("Issurance_PDF");
 			actualPdfPath= System.getProperty("ActualPDFPath")+ Input.getValue().get("Testdata");
 			resultPdfPath= System.getProperty("ResultPDFPath") + Input.getValue().get("Testdata");
-
+            System.out.println(Input.getValue().get("Testdata") + " is Starts Comparing"); 
 		    String status=	pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
 		    inputrow.put("Status", status);
-		    db_obj.UpdateRow(Integer.parseInt(Input.getValue().get("S.No")), inputrow);*/
+		    db_obj.UpdateRow(Integer.parseInt(Input.getValue().get("S.No")), inputrow);
+		    System.out.println("Comparison Completed for "+Input.getValue().get("Testdata"));*/
 		}
 	}
 }
