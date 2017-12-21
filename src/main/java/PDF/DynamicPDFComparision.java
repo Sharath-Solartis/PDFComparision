@@ -66,8 +66,8 @@ public class DynamicPDFComparision
 			System.out.println(expectedPdfPath);
 			
 			actualPdfURL=Input.getValue().get("Issurance_PDF");
-			actualPdfPath= System.getProperty("ActualPDFPath")+"\\"+ Input.getValue().get("Testdata");
-			resultPdfPath= System.getProperty("ResultPDFPath")+"\\" + Input.getValue().get("Testdata");
+			actualPdfPath= System.getProperty("ActualPDFPath")+"/"+ Input.getValue().get("Testdata");
+			resultPdfPath= System.getProperty("ResultPDFPath")+"/" + Input.getValue().get("Testdata");
             System.out.println(Input.getValue().get("Testdata") + " is Starts Comparing"); 
             
 		    String status=	pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
