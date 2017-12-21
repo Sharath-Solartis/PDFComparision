@@ -7,38 +7,72 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
+import org.apache.commons.io.FileUtils;
 import org.xml.sax.SAXException;
-
-import de.redsix.pdfcompare.PdfComparator;
+import com.testautomationguru.utility.CompareMode;
+import com.testautomationguru.utility.PDFUtil;
 
 public class PDFComparision
 {	
+	public static boolean successful;
 	public PDFComparision() 
 	{
 		
 	}
 	
-	@SuppressWarnings("rawtypes")
 	public String comparePDFVisually(String PDF1path, String PDF2URL,String PDF2pathwithpdfname, String Resultpath) throws IOException
 	{
-		String result;
-		//PDF2path = "B:/ActualPDF";
+		String result = null;
+		
 		urltopdf(PDF2URL,PDF2pathwithpdfname);
-		PdfComparator pdfcompare = new PdfComparator(PDF1path, PDF2pathwithpdfname+".pdf");
-		pdfcompare.compare().writeTo(Resultpath);
-		System.out.println(pdfcompare.getResult());
-        boolean isEqual=new PdfComparator(PDF1path, PDF2pathwithpdfname+".pdf").compare().writeTo(Resultpath);
-        if(!isEqual)
-        {
-            System.out.println("Difference found in PDFs");
-            result = "Pass";
-        }
-        else
-        {
-            System.out.println("Difference not found in PDFs");
-            result = "Fail";
-        }
+        
+		PDFUtil pdfUtil = new PDFUtil();
+	    pdfUtil.setCompareMode(CompareMode.VISUAL_MODE);
+	    pdfUtil.highlightPdfDifference(true);
+	    
+	    int Expected_PageCount=pdfUtil.getPageCount(PDF1path);    
+	    int Autual_PageCount=pdfUtil.getPageCount(PDF2pathwithpdfname+".pdf"); 
+	    
+	    if(Expected_PageCount==Autual_PageCount)
+	    {
+	    	File dir = new File(Resultpath);
+	            if (! dir.exists())
+	            {
+	                 successful = dir.mkdir();
+	            }
+	            else
+	            {
+	                System.out.println("Clearing all Past Datas from "+dir);
+	                FileUtils.cleanDirectory(dir);
+	                successful = true;
+	            }
+	           
+	            if (successful)
+	            {
+	            	pdfUtil.setImageDestinationPath(Resultpath);
+	    		    boolean isEqual=pdfUtil.compare(PDF1path, PDF2pathwithpdfname+".pdf", 1, Expected_PageCount, true, true);
+	    		    if(!isEqual)
+	    	        {
+	    	            System.out.println("Difference found in PDFs");
+	    	            result = "Fail";
+	    	        }
+	    	        else
+	    	        {
+	    	            System.out.println("Difference not found in PDFs");
+	    	            result = "Pass";
+	    	        }
+	      }
+	      else
+	      {
+	         System.out.println("Directory is not present");
+	      } 
+	        
+	    }
+	    else
+	    {
+	    	System.out.println("Count of PDF Pages are different");
+            result = "PageCountError";
+	    }
         return result;
 	}
 	

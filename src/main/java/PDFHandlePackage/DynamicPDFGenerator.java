@@ -45,8 +45,8 @@ public class DynamicPDFGenerator
 	    bwr.write(buf_to_change_XMLSource.toString());
 	    bwr.flush();
 	    bwr.close();*/
-		String result = HTTPRequester(buf_to_change_XMLSource.toString());
 		//System.out.println(buf_to_change_XMLSource.toString());
+		String result = HTTPRequester(buf_to_change_XMLSource.toString());
 		int start = result.indexOf("<PdfFileName>");
 		int end = result.indexOf("</PdfFileName>");
 		return("A:\\" + result.substring(start+13, end));
@@ -58,6 +58,7 @@ public class DynamicPDFGenerator
 		for (Map.Entry<Integer, LinkedHashMap<String, String>> Conditionchecking : ConditionTable.entrySet() ) 
 		{
 			LinkedHashMap<String, String> value = Conditionchecking.getValue();
+			//System.out.println(value.get("S.No"));
 			boolean flag = cond_check.ConditionReading(value.get("Condition").trim(), inputRow_hashMap);
 			ValidateForms_Insert_List(ListOfForms,value.get("Form_Name"),value.get("Schedule_Form_Name"),value.get("Schedule_Form_Number"),flag);
 		}
@@ -188,6 +189,7 @@ public class DynamicPDFGenerator
 	{
 		http = new HttpHandle("https://qapdfservice.solartis.net/PDFGenerationService-3.0/PDFGenerationService/3_0/generatePDF","POST");
 		http.AddHeader("Content-Type", "application/xml");
+		//System.out.println(PDF);
 		http.SendData(PDF);
 		String response_string = http.ReceiveData();
 		return response_string;

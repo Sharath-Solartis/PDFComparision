@@ -1,16 +1,18 @@
 package PDF;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
-
 import PDFHandleException.DatabaseException;
 import PDFHandleException.HTTPHandleException;
 import PDFHandlePackage.DatabaseOperation;
 import PDFHandlePackage.DynamicPDFGenerator;
 import PDFHandlePackage.PDFComparision;
+import PDFHandlePackage.MailService;
+import PDFHandlePackage.PackageHandle;;
 
 public class DynamicPDFComparision 
 {	
@@ -20,6 +22,8 @@ public class DynamicPDFComparision
 	public static DatabaseOperation Output_db_obj = null;
 	public static DynamicPDFGenerator DynamicPDF;
 	public static PDFComparision pdfcompare;
+	public static MailService Mailing;
+	public static PackageHandle Archiving;
 	private static String expectedPdfPath;
 	private static String actualPdfPath;
 	private static String resultPdfPath;
@@ -45,9 +49,12 @@ public class DynamicPDFComparision
 		LinkedHashMap<Integer, LinkedHashMap<String, String>> InputTable = Input_db_obj.GetDataObjects("SELECT * FROM "+ System.getProperty("InputTable") +" t1 JOIN "+ System.getProperty("OutputQuoteTable") +" t2 JOIN "+ System.getProperty("OutputPolicyTable") +" t3 ON t1.`S.No` = t2.`S.No` AND t2.`S.No` = t3.`S.No`");
 		Iterator<Entry<Integer, LinkedHashMap<String, String>>> inputtableiterator = InputTable.entrySet().iterator();
 		
-		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable = Output_db_obj.GetDataObjects("SELECT * FROM "+System.getProperty("InputTable"));
+		LinkedHashMap<Integer, LinkedHashMap<String, String>> OutputTable = Output_db_obj.GetDataObjects("SELECT * FROM " + System.getProperty("OutputTable"));
 		Iterator<Entry<Integer, LinkedHashMap<String, String>>> outputtableiterator = OutputTable.entrySet().iterator();
 		
+		 Path Result = Paths.get(System.getProperty("ResultPDFPath"));
+         Path ResultZIP = Paths.get(System.getProperty("ResultPDFPath")+".zip");
+ 
 		while (inputtableiterator.hasNext() && outputtableiterator.hasNext())
 		{
 			Entry<Integer, LinkedHashMap<String, String>> Input = inputtableiterator.next();
@@ -58,14 +65,19 @@ public class DynamicPDFComparision
 			expectedPdfPath = DynamicPDF.PDFGenerator(ConditionTable, Input, XMlSource_tag_table, System.getProperty("SamplePDFRequest"), System.getProperty("TransactionType"));
 			System.out.println(expectedPdfPath);
 			
-			/*actualPdfURL=Input.getValue().get("Issurance_PDF");
-			actualPdfPath= System.getProperty("ActualPDFPath")+ Input.getValue().get("Testdata");
-			resultPdfPath= System.getProperty("ResultPDFPath") + Input.getValue().get("Testdata");
+			actualPdfURL=Input.getValue().get("Issurance_PDF");
+			actualPdfPath= System.getProperty("ActualPDFPath")+"\\"+ Input.getValue().get("Testdata");
+			resultPdfPath= System.getProperty("ResultPDFPath")+"\\" + Input.getValue().get("Testdata");
             System.out.println(Input.getValue().get("Testdata") + " is Starts Comparing"); 
+            
 		    String status=	pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
 		    inputrow.put("Status", status);
 		    Output_db_obj.UpdateRow(Output.getKey(), inputrow);
-		    System.out.println("Comparison Completed for "+Input.getValue().get("Testdata"));*/
+		    System.out.println("Comparison Completed for "+Input.getValue().get("Testdata"));
 		}
+		 Archiving.pack(Result, ResultZIP);
+		 System.out.print("Archiving the Folder : "+ Result);
+         /*Mailing.sendMail(System.getProperty("From"), System.getProperty("To"), System.getProperty("Username"), System.getProperty("Password"), System.getProperty("Subject"), System.getProperty("Body"), System.getProperty("ResultPDFPath")+".zip");
+         System.out.print("Sending Result as Mail to : "+ System.getProperty("To"));*/
 	}
 }

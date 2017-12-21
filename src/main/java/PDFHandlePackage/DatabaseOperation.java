@@ -106,8 +106,6 @@ public class DatabaseOperation
 			    {
 					for (int i = 1; i <= meta.getColumnCount(); i++) 
 					{  
-						System.out.println(meta.getColumnName(i));
-						System.out.println(row.get(meta.getColumnName(i)));
 				       rs.updateString(meta.getColumnName(i), row.get(meta.getColumnName(i)));     
 				    }
 					rs.updateRow();

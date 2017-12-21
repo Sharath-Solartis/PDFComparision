@@ -88,12 +88,19 @@
 	    <version>5.1.39</version>
 	</dependency>
 	
+	 <!-- https://mvnrepository.com/artifact/com.testautomationguru.pdfutil/pdf-util -->
 	<dependency>
-	    <groupId>de.redsix</groupId>
-	    <artifactId>pdfcompare</artifactId>
-	    <version>1.1.25</version>
-	  </dependency>
-	  
+	    <groupId>com.testautomationguru.pdfutil</groupId>
+	    <artifactId>pdf-util</artifactId>
+	    <version>0.0.1</version>
+	</dependency>
+ 
+ 	<!-- https://mvnrepository.com/artifact/javax.mail/mail -->
+	<dependency>
+	    <groupId>javax.mail</groupId>
+	    <artifactId>mail</artifactId>
+	    <version>1.4</version>
+	</dependency>
   </dependencies>
   
   <build>
@@ -124,6 +131,7 @@
                                 <FormsConditionalTable>${FormsConditionalTable}</FormsConditionalTable>
                                 <XmlSourceTable>${XmlSourceTable}</XmlSourceTable>
                                 <InputTable>${InputTable}</InputTable>
+                                <OutputTable>${OutputTable}</OutputTable>
                                 <OutputQuoteTable>${OutputQuoteTable}</OutputQuoteTable>
                                 <OutputPolicyTable>${OutputPolicyTable}</OutputPolicyTable>
                                 <JDBC_DRIVER>${JDBC_DRIVER}</JDBC_DRIVER>
@@ -134,6 +142,14 @@
                                 <SamplePDFRequest>${SamplePDFRequest}</SamplePDFRequest>
                                 <ActualPDFPath>${ActualPDFPath}</ActualPDFPath>
                                 <ResultPDFPath>${ResultPDFPath}</ResultPDFPath>
+                                
+                                <From>${From}</From>
+                                <To>${To}</To>
+                                <Username>${Username}</Username>
+                                <Password>${Password}</Password>
+                                <Subject>${Subject}</Subject>
+                                <Body>${Body}</Body>
+                                                                
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

@@ -188,11 +188,11 @@ public class ConditionsChecking extends DatabaseOperation
 												DateValueFormDB = row.get(cond).split("-");
 												Date cDate = new Date(Integer.parseInt(DateValue[0]),Integer.parseInt(DateValue[1]),Integer.parseInt(DateValue[2]));  
 										        Date Effdate= new Date(Integer.parseInt(DateValueFormDB[0]),Integer.parseInt(DateValueFormDB[1]),Integer.parseInt(DateValueFormDB[2]));
-										        if (Effdate.compareTo(cDate)>0 || Effdate.compareTo(cDate)==0) 
+										        if (Effdate.before(cDate) || Effdate.equals(cDate)) 
 										        	ConditionReading=true;
 										        else
-										        	ConditionReading=false; 
-										   }	
+										        	ConditionReading=false;
+										    }	
 											break;
 								case ">>=": if(individualValue[j].contains("-"))
 										   {
@@ -200,10 +200,11 @@ public class ConditionsChecking extends DatabaseOperation
 												DateValueFormDB = row.get(cond).split("-");
 												Date cDate = new Date(Integer.parseInt(DateValue[0]),Integer.parseInt(DateValue[1]),Integer.parseInt(DateValue[2]));  
 										        Date Effdate= new Date(Integer.parseInt(DateValueFormDB[0]),Integer.parseInt(DateValueFormDB[1]),Integer.parseInt(DateValueFormDB[2]));
-										        if (Effdate.compareTo(cDate)<0 || Effdate.compareTo(cDate)==0)
+										        if (Effdate.after(cDate) || Effdate.equals(cDate))
 										        	ConditionReading=true;
 										        else
-										        	ConditionReading=false; 
+										        	ConditionReading=false;
+			
 										   }	
 											break;
 								}
