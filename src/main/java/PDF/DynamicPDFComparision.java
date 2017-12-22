@@ -35,7 +35,7 @@ public class DynamicPDFComparision
 	private static String actualPdfURL;
 	public static String inputfilepath = "C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\pdfservicesolartisnet_1510893129634_83_request.xml";
 
-	@SuppressWarnings({ "static-access", "unused" })
+	@SuppressWarnings({ "static-access" })
 	public static void main(String args[]) throws DatabaseException, IOException, HTTPHandleException, InterruptedException
 	{
 		DatabaseOperation.ConnectionSetup(System.getProperty("JDBC_DRIVER"), System.getProperty("DB_URL"), System.getProperty("USER"), System.getProperty("password"));
@@ -68,6 +68,7 @@ public class DynamicPDFComparision
 			System.out.println(Input.getValue().get("Testdata") + " is Running");
 			LinkedHashMap<String, String> inputrow = Input.getValue();
 			expectedPdfPath = DynamicPDF.PDFGenerator(ConditionTable, Input, XMlSource_tag_table, System.getProperty("SamplePDFRequest"), System.getProperty("TransactionType"));
+			expectedPdfPath = expectedPdfPath.replace("\\", "/");
 			System.out.println(expectedPdfPath);
 			
 			actualPdfURL=Input.getValue().get("Issurance_PDF");
@@ -75,12 +76,13 @@ public class DynamicPDFComparision
 			resultPdfPath= System.getProperty("ResultPDFPath")+"/" + Input.getValue().get("Testdata");
             System.out.println(Input.getValue().get("Testdata") + " is Starts Comparing"); 
             
-            /*TimeUnit.SECONDS.sleep(60);
+            //TimeUnit.SECONDS.sleep(60);
             
-            File source = new File(expectedPdfPath);
+            /*File source = new File(expectedPdfPath);
             File dest = new File("E:/Jmeter-server/STARR_BOP-PaaS/Request_Response/ExpectedPDF/"+Input.getValue().get("Testdata"));
             try 
             {
+            	System.out.println();
                 FileUtils.copyDirectory(source, dest);
             } 
             catch (IOException e) 
