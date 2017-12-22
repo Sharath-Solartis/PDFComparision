@@ -112,7 +112,7 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
-                    <compilerArgument>-Xlint:none</compilerArgument>
+                    <failOnError>false</failOnError>
                 </configuration>
             </plugin>
             <plugin>
