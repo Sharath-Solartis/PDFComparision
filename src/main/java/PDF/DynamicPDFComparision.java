@@ -1,11 +1,16 @@
 package PDF;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.FileUtils;
+
 import PDFHandleException.DatabaseException;
 import PDFHandleException.HTTPHandleException;
 import PDFHandlePackage.DatabaseOperation;
@@ -31,7 +36,7 @@ public class DynamicPDFComparision
 	public static String inputfilepath = "C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\pdfservicesolartisnet_1510893129634_83_request.xml";
 
 	@SuppressWarnings({ "static-access", "unused" })
-	public static void main(String args[]) throws DatabaseException, IOException, HTTPHandleException
+	public static void main(String args[]) throws DatabaseException, IOException, HTTPHandleException, InterruptedException
 	{
 		DatabaseOperation.ConnectionSetup(System.getProperty("JDBC_DRIVER"), System.getProperty("DB_URL"), System.getProperty("USER"), System.getProperty("password"));
 		
@@ -70,6 +75,20 @@ public class DynamicPDFComparision
 			resultPdfPath= System.getProperty("ResultPDFPath")+"/" + Input.getValue().get("Testdata");
             System.out.println(Input.getValue().get("Testdata") + " is Starts Comparing"); 
             
+            /*TimeUnit.SECONDS.sleep(60);
+            
+            File source = new File(expectedPdfPath);
+            File dest = new File("E:/Jmeter-server/STARR_BOP-PaaS/Request_Response/ExpectedPDF/"+Input.getValue().get("Testdata"));
+            try 
+            {
+                FileUtils.copyDirectory(source, dest);
+            } 
+            catch (IOException e) 
+            {
+            	System.out.println("Error in copying Expected");
+                e.printStackTrace();
+            }*/
+            
 		    String status=	pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
 		    inputrow.put("Status", status);
 		    Output_db_obj.UpdateRow(Output.getKey(), inputrow);
@@ -77,7 +96,8 @@ public class DynamicPDFComparision
 		}
 		 Archiving.pack(Result, ResultZIP);
 		 System.out.print("Archiving the Folder : "+ Result);
-         /*Mailing.sendMail(System.getProperty("From"), System.getProperty("To"), System.getProperty("Username"), System.getProperty("Password"), System.getProperty("Subject"), System.getProperty("Body"), System.getProperty("ResultPDFPath")+".zip");
-         System.out.print("Sending Result as Mail to : "+ System.getProperty("To"));*/
+         Mailing.sendMail(System.getProperty("From"), System.getProperty("To"), System.getProperty("Username"), System.getProperty("Password"), System.getProperty("Subject"), System.getProperty("Body"), System.getProperty("ResultPDFPath")+".zip");
+         System.out.print("Sending Result as Mail to : "+ System.getProperty("To"));
 	}
+	
 }
