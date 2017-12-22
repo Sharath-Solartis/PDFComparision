@@ -35,7 +35,7 @@ public class DynamicPDFComparision
 	private static String actualPdfURL;
 	public static String inputfilepath = "C:\\Users\\vigneshkumar_p.SOLARTISTECH\\Desktop\\pdfservicesolartisnet_1510893129634_83_request.xml";
 
-	@SuppressWarnings({ "static-access" })
+	@SuppressWarnings({ "all" })
 	public static void main(String args[]) throws DatabaseException, IOException, HTTPHandleException, InterruptedException
 	{
 		DatabaseOperation.ConnectionSetup(System.getProperty("JDBC_DRIVER"), System.getProperty("DB_URL"), System.getProperty("USER"), System.getProperty("password"));
