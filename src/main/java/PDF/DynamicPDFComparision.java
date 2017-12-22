@@ -76,20 +76,19 @@ public class DynamicPDFComparision
 			resultPdfPath= System.getProperty("ResultPDFPath")+"/" + Input.getValue().get("Testdata");
             System.out.println(Input.getValue().get("Testdata") + " is Starts Comparing"); 
             
-            //TimeUnit.SECONDS.sleep(60);
             
-            /*File source = new File(expectedPdfPath);
-            File dest = new File("E:/Jmeter-server/STARR_BOP-PaaS/Request_Response/ExpectedPDF/"+Input.getValue().get("Testdata"));
+            File source = new File(expectedPdfPath);
+            File dest = new File("E:/Jmeter-server/STARR_BOP-PaaS/Request_Response/ExpectedPDF/");
             try 
             {
-            	System.out.println();
-                FileUtils.copyDirectory(source, dest);
+            	System.out.println(source);
+                FileUtils.copyFileToDirectory(source, dest);
             } 
             catch (IOException e) 
             {
             	System.out.println("Error in copying Expected");
                 e.printStackTrace();
-            }*/
+            }
             
 		    String status=	pdfcompare.comparePDFVisually(expectedPdfPath, actualPdfURL, actualPdfPath,resultPdfPath);
 		    inputrow.put("Status", status);
